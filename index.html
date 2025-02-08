@@ -1,31 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Chatbot</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Chatbot</title>
+  <!-- Link to external CSS file -->
+  <link rel="stylesheet" href="styles.css">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
 </head>
 <body>
-
-    <div class="container">
-        <div class="sidebar">
-            <h2>💬 HORIZON</h2>
-            <div id="tab-container"></div>
-            <button id="new-chat">➕ New Chat</button>
-        </div>
-
-        <div class="chat-section">
-            <div class="chat-container">
-                <div id="chatbox" class="chatbox"></div>
-                <div class="input-container">
-                    <input type="text" id="userInput" placeholder="Type a message...">
-                    <button onclick="sendMessage()">Send</button>
-                </div>
-            </div>
-        </div>
+  <div class="container">
+    <!-- Sidebar with logo, theme toggle, and chat tabs -->
+    <div class="sidebar">
+      <div class="logo-container">
+        <h2>💬 HORIZON</h2>
+        <button id="theme-toggle" class="theme-toggle-btn" data-tooltip="Toggle Theme">
+          <i class="fa-solid fa-sun"></i>
+        </button>
+      </div>
+      <div id="tab-container"></div>
+      <button id="new-chat">➕ New Chat</button>
     </div>
-
-    <script src="script.js"></script>
+    <!-- Chat Section -->
+    <div class="chat-section">
+      <div class="chat-container">
+        <div id="chatbox" class="chatbox"></div>
+        <div class="input-container">
+          <button id="mic-toggle" class="btn" data-tooltip="Voice Input">
+            <i class="fa-solid fa-microphone"></i>
+          </button>
+          <input type="text" id="userInput" placeholder="Type a message...">
+          <!-- The Send button is now replaced with an arrow icon -->
+          <button onclick="sendMessage()">
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Link to external JavaScript file -->
+  <script src="script.js"></script>
 </body>
 </html>
