@@ -6,6 +6,14 @@ const userInput = document.getElementById("userInput");
 const newChatButton = document.getElementById("new-chat");
 const themeToggleButton = document.getElementById("theme-toggle");
 const micToggle = document.getElementById("mic-toggle");
+const exploreBotsButton = document.getElementById("explore-bots");
+
+// Define available bots for the Explore Bots feature
+const availableBots = [
+  { id: 'general', name: 'General Bot', description: 'All-purpose chatbot.' },
+  { id: 'coding', name: 'Coding Bot', description: 'Assists with programming queries.' },
+  { id: 'math', name: 'Math Bot', description: 'Helps solve math problems.' }
+];
 
 let conversations = {};
 let activeTab = null;
@@ -69,7 +77,12 @@ function saveConversations() {
 function loadConversations() {
   const saved = localStorage.getItem("conversations");
   if (saved) {
-    conversations = JSON.parse(saved);
+    try {
+      conversations = JSON.parse(saved);
+    } catch (error) {
+      console.error("Error parsing conversations:", error);
+      conversations = {};
+    }
     Object.keys(conversations).forEach((tabId, index) => {
       createTabElement(tabId, `Chat ${index + 1}`);
     });
@@ -177,6 +190,7 @@ function createNewChat() {
   createTabElement(tabId, `Chat ${Object.keys(conversations).length}`);
   switchTab(tabId);
   saveConversations();
+  displayChatHeader();
 }
 
 function switchTab(tabId) {
@@ -190,6 +204,22 @@ function switchTab(tabId) {
   if (conversations[tabId]) {
     conversations[tabId].forEach(({ text, sender }) => addMessage(text, sender, false));
   }
+  if (conversations[tabId].length === 0) {
+    displayChatHeader();
+  }
+}
+
+// ------------------------- Chat Header Function -------------------------
+function displayChatHeader() {
+  if (!document.querySelector('.chat-header')) {
+    const header = document.createElement("h1");
+    header.classList.add("chat-header");
+    header.textContent = "Hi, I'm Horizon. How can I help you today?";
+    header.style.textAlign = "center";
+    header.style.margin = "20px 0";
+    const chatContainer = document.querySelector('.chat-container');
+    chatContainer.insertBefore(header, chatContainer.firstChild);
+  }
 }
 
 // ------------------------- Chat Functions -------------------------
@@ -200,7 +230,6 @@ async function sendMessage() {
   addMessage(userText, "user");
   userInput.value = "";
   
-  // Build conversation history using raw text (without prefixes)
   const conversationHistory = conversations[activeTab]
     .map(msg => msg.text)
     .join("\n");
@@ -221,7 +250,9 @@ async function sendMessage() {
       })
     });
     const data = await response.json();
-    chatbox.removeChild(typingDiv);
+    if (chatbox.contains(typingDiv)) {
+      chatbox.removeChild(typingDiv);
+    }
     
     let botReply = data.candidates &&
                    data.candidates[0] &&
@@ -233,20 +264,24 @@ async function sendMessage() {
       botReply = "I couldn't understand that.";
     }
     botReply = formatMessage(botReply);
-    // Do NOT prepend "Bot:" here; it will be added only for display
     addMessage(botReply, "bot");
   } catch (error) {
     console.error("Error:", error);
-    chatbox.removeChild(typingDiv);
+    if (chatbox.contains(typingDiv)) {
+      chatbox.removeChild(typingDiv);
+    }
     addMessage("Error: Unable to connect to AI.", "bot");
   }
 }
 
 function addMessage(text, sender, saveToConversation = true) {
+  // Remove the chat header if it exists
+  const header = document.querySelector('.chat-header');
+  if (header) header.remove();
+  
   const messageDiv = document.createElement("div");
   messageDiv.classList.add("message", sender);
   
-  // For bot messages, display with a single "Bot:" prefix (without storing the prefix)
   if (sender === "bot") {
     messageDiv.innerHTML = "Bot: " + text;
   } else {
@@ -256,13 +291,11 @@ function addMessage(text, sender, saveToConversation = true) {
   chatbox.appendChild(messageDiv);
   chatbox.scrollTop = chatbox.scrollHeight;
   
-  // Save the raw text (without the "Bot:" prefix) in conversation history
   if (saveToConversation) {
     conversations[activeTab].push({ text, sender });
     saveConversations();
   }
   
-  // If the message is from the bot, add action buttons below the message
   if (sender === "bot") {
     const buttonContainer = document.createElement("div");
     buttonContainer.classList.add("bot-buttons");
@@ -281,10 +314,17 @@ function addMessage(text, sender, saveToConversation = true) {
       toggleReadAloud(text, readAloudBtn);
     };
     
+    // Create like and dislike buttons together before setting event handlers
     const likeBtn = document.createElement("button");
     likeBtn.classList.add("btn", "like-btn");
     likeBtn.setAttribute("data-tooltip", "Like");
     likeBtn.innerHTML = '<i class="fa-solid fa-thumbs-up"></i>';
+    
+    const dislikeBtn = document.createElement("button");
+    dislikeBtn.classList.add("btn", "dislike-btn");
+    dislikeBtn.setAttribute("data-tooltip", "Dislike");
+    dislikeBtn.innerHTML = '<i class="fa-solid fa-thumbs-down"></i>';
+    
     likeBtn.onclick = function () {
       likeBtn.classList.toggle("liked");
       if (dislikeBtn.classList.contains("disliked")) {
@@ -292,10 +332,6 @@ function addMessage(text, sender, saveToConversation = true) {
       }
     };
     
-    const dislikeBtn = document.createElement("button");
-    dislikeBtn.classList.add("btn", "dislike-btn");
-    dislikeBtn.setAttribute("data-tooltip", "Dislike");
-    dislikeBtn.innerHTML = '<i class="fa-solid fa-thumbs-down"></i>';
     dislikeBtn.onclick = function () {
       dislikeBtn.classList.toggle("disliked");
       if (likeBtn.classList.contains("liked")) {
@@ -319,7 +355,8 @@ function toggleReadAloud(text, button) {
     speechInstance.volume = 1;
     speechInstance.rate = 1;
     speechInstance.pitch = 1;
-    const voices = speechSynthesis.getVoices();
+    const voices = window.speechSynthesis.getVoices();
+    // Use a specific voice if available, otherwise default to the first one
     speechInstance.voice = voices.find(voice => voice.name.includes("Google UK English Male")) || voices[0];
     speechInstance.onend = () => {
       isSpeaking = false;
@@ -342,7 +379,6 @@ function copyToClipboard(text) {
 }
 
 function formatMessage(text) {
-  // Basic markdown formatting for headers, bold, and italics
   text = text.replace(/^###### (.*$)/gim, "<h6>$1</h6>");
   text = text.replace(/^##### (.*$)/gim, "<h5>$1</h5>");
   text = text.replace(/^#### (.*$)/gim, "<h4>$1</h4>");
@@ -356,9 +392,50 @@ function formatMessage(text) {
   return text;
 }
 
+// ------------------------- Explore Bots Functions -------------------------
+function showBotExplorer() {
+  const explorerOverlay = document.getElementById("bot-explorer-overlay");
+  const botList = document.getElementById("bot-list");
+  
+  botList.innerHTML = "";
+  
+  availableBots.forEach(bot => {
+    const botItem = document.createElement("div");
+    botItem.className = "bot-item";
+    botItem.innerHTML = `<strong>${bot.name}</strong><br>${bot.description}`;
+    botItem.addEventListener("click", () => {
+      selectBot(bot);
+      hideBotExplorer();
+    });
+    botList.appendChild(botItem);
+  });
+  
+  explorerOverlay.style.display = "flex";
+}
+
+function hideBotExplorer() {
+  const explorerOverlay = document.getElementById("bot-explorer-overlay");
+  explorerOverlay.style.display = "none";
+}
+
+function selectBot(bot) {
+  alert("Selected: " + bot.name);
+  createNewChat();
+  const activeTabElement = document.querySelector(`[data-id='${activeTab}']`);
+  if (activeTabElement) {
+    const titleSpan = activeTabElement.querySelector(".tab-title");
+    titleSpan.textContent = bot.name;
+  }
+}
+
 // ------------------------- Initialization -------------------------
 loadConversations();
 if (!activeTab) {
   createNewChat();
 }
 newChatButton.addEventListener("click", createNewChat);
+
+// Display chat header if the active conversation is empty
+if (conversations[activeTab] && conversations[activeTab].length === 0) {
+  displayChatHeader();
+}
