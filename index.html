@@ -20,6 +20,10 @@
         </button>
       </div>
       <div id="tab-container"></div>
+      <!-- New Explore Bots Button -->
+      <button id="explore-bots" onclick="showBotExplorer()">
+        <i class="fa-solid fa-robot"></i> Explore Bots
+      </button>
       <button id="new-chat">➕ New Chat</button>
     </div>
     <!-- Chat Section -->
@@ -39,6 +43,18 @@
       </div>
     </div>
   </div>
+
+  <!-- Bot Explorer Overlay -->
+  <div id="bot-explorer-overlay">
+    <div id="bot-explorer-container">
+      <h2>Explore Bots</h2>
+      <button id="close-bot-explorer" class="close-button" onclick="hideBotExplorer()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div id="bot-list"></div>
+    </div>
+  </div>
+
   <!-- Link to external JavaScript file -->
   <script src="script.js"></script>
 </body>
