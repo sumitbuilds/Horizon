@@ -7,14 +7,13 @@ const newChatButton = document.getElementById("new-chat");
 const themeToggleButton = document.getElementById("theme-toggle");
 const micToggle = document.getElementById("mic-toggle");
 const exploreBotsButton = document.getElementById("explore-bots");
+const themeSelect = document.getElementById("theme-select");
 
-// Define available bots for the Explore Bots feature
-const availableBots = [
-  { id: 'general', name: 'General Bot', description: 'All-purpose chatbot.' },
-  { id: 'coding', name: 'Coding Bot', description: 'Assists with programming queries.' },
-  { id: 'math', name: 'Math Bot', description: 'Helps solve math problems.' }
-];
+// Mobile Sidebar Toggle Elements
+const mobileSidebarToggle = document.getElementById("mobile-sidebar-toggle");
+const sidebar = document.querySelector(".sidebar");
 
+// Other variables
 let conversations = {};
 let activeTab = null;
 let isSpeaking = false;
@@ -22,7 +21,47 @@ let speechInstance = null;
 let recognition;
 let isRecording = false;
 
-// Setup speech recognition if available
+// ------------------------- Mobile Sidebar Toggle -------------------------
+if (mobileSidebarToggle && sidebar) {
+  mobileSidebarToggle.addEventListener("click", () => {
+    sidebar.classList.toggle("visible");
+  });
+  
+  // Optional: Hide sidebar when clicking on the chat container on mobile devices
+  const chatContainer = document.querySelector(".chat-container");
+  if (chatContainer) {
+    chatContainer.addEventListener("click", () => {
+      if (window.innerWidth <= 768 && sidebar.classList.contains("visible")) {
+        sidebar.classList.remove("visible");
+      }
+    });
+  }
+}
+
+// ------------------------- Theme Selection -------------------------
+if (localStorage.getItem("selectedTheme")) {
+  let savedTheme = localStorage.getItem("selectedTheme");
+  if (savedTheme === "default" || savedTheme === "") {
+    document.body.className = "";
+    themeSelect.value = "default";
+  } else {
+    document.body.className = savedTheme;
+    themeSelect.value = savedTheme;
+  }
+}
+
+themeSelect.addEventListener("change", (e) => {
+  const selectedTheme = e.target.value;
+  if (selectedTheme === "default") {
+    document.body.className = "";
+    localStorage.setItem("selectedTheme", "");
+  } else {
+    document.body.className = selectedTheme;
+    localStorage.setItem("selectedTheme", selectedTheme);
+  }
+});
+
+// ------------------------- Speech Recognition Setup -------------------------
 if ('webkitSpeechRecognition' in window) {
   recognition = new webkitSpeechRecognition();
 } else if ('SpeechRecognition' in window) {
@@ -60,6 +99,7 @@ micToggle.addEventListener("click", () => {
   }
 });
 
+// ------------------------- Theme Toggle Button -------------------------
 themeToggleButton.addEventListener("click", () => {
   document.body.classList.toggle("light-mode");
   if (document.body.classList.contains("light-mode")) {
@@ -127,12 +167,13 @@ function toggleTabMenu(tab, tabId) {
   dropdown = document.createElement("div");
   dropdown.classList.add("tab-menu-dropdown");
 
+  // Inline rename option
   const renameOption = document.createElement("div");
   renameOption.classList.add("tab-menu-option");
   renameOption.textContent = "Rename Chat";
   renameOption.addEventListener("click", (e) => {
     e.stopPropagation();
-    renameTab(tab);
+    inlineRenameTab(tab);
     dropdown.remove();
   });
 
@@ -159,29 +200,42 @@ document.addEventListener("click", (e) => {
 });
 
 function deleteTab(tab, tabId) {
-  if (confirm("Are you sure you want to delete this chat?")) {
-    tab.remove();
-    delete conversations[tabId];
-    saveConversations();
-    if (activeTab === tabId) {
-      const remaining = Object.keys(conversations);
-      if (remaining.length > 0) {
-        activeTab = remaining[remaining.length - 1];
-        switchTab(activeTab);
-      } else {
-        activeTab = null;
-        createNewChat();
-      }
+  tab.remove();
+  delete conversations[tabId];
+  saveConversations();
+  if (activeTab === tabId) {
+    const remaining = Object.keys(conversations);
+    if (remaining.length > 0) {
+      activeTab = remaining[remaining.length - 1];
+      switchTab(activeTab);
+    } else {
+      activeTab = null;
+      createNewChat();
     }
   }
 }
 
-function renameTab(tab) {
+function inlineRenameTab(tab) {
   const titleSpan = tab.querySelector(".tab-title");
-  const newName = prompt("Enter a new name for this chat:", titleSpan.textContent);
-  if (newName) {
-    titleSpan.textContent = newName;
-  }
+  const currentName = titleSpan.textContent;
+  const input = document.createElement("input");
+  input.type = "text";
+  input.value = currentName;
+  input.className = "tab-rename-input";
+  titleSpan.replaceWith(input);
+  input.focus();
+  input.addEventListener("blur", () => {
+    const newName = input.value.trim() || currentName;
+    const newSpan = document.createElement("span");
+    newSpan.classList.add("tab-title");
+    newSpan.textContent = newName;
+    input.replaceWith(newSpan);
+  });
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      input.blur();
+    }
+  });
 }
 
 function createNewChat() {
@@ -209,7 +263,7 @@ function switchTab(tabId) {
   }
 }
 
-// ------------------------- Chat Header Function -------------------------
+// ------------------------- Chat Header -------------------------
 function displayChatHeader() {
   if (!document.querySelector('.chat-header')) {
     const header = document.createElement("h1");
@@ -275,7 +329,7 @@ async function sendMessage() {
 }
 
 function addMessage(text, sender, saveToConversation = true) {
-  // Remove the chat header if it exists
+  // Remove chat header if it exists
   const header = document.querySelector('.chat-header');
   if (header) header.remove();
   
@@ -304,7 +358,7 @@ function addMessage(text, sender, saveToConversation = true) {
     copyBtn.classList.add("btn", "copy-btn");
     copyBtn.setAttribute("data-tooltip", "Copy");
     copyBtn.innerHTML = '<i class="fa-solid fa-copy"></i>';
-    copyBtn.onclick = () => copyToClipboard(text);
+    copyBtn.onclick = () => copyToClipboard(text, copyBtn);
     
     const readAloudBtn = document.createElement("button");
     readAloudBtn.classList.add("btn", "read-aloud-btn");
@@ -314,17 +368,10 @@ function addMessage(text, sender, saveToConversation = true) {
       toggleReadAloud(text, readAloudBtn);
     };
     
-    // Create like and dislike buttons together before setting event handlers
     const likeBtn = document.createElement("button");
     likeBtn.classList.add("btn", "like-btn");
     likeBtn.setAttribute("data-tooltip", "Like");
     likeBtn.innerHTML = '<i class="fa-solid fa-thumbs-up"></i>';
-    
-    const dislikeBtn = document.createElement("button");
-    dislikeBtn.classList.add("btn", "dislike-btn");
-    dislikeBtn.setAttribute("data-tooltip", "Dislike");
-    dislikeBtn.innerHTML = '<i class="fa-solid fa-thumbs-down"></i>';
-    
     likeBtn.onclick = function () {
       likeBtn.classList.toggle("liked");
       if (dislikeBtn.classList.contains("disliked")) {
@@ -332,6 +379,10 @@ function addMessage(text, sender, saveToConversation = true) {
       }
     };
     
+    const dislikeBtn = document.createElement("button");
+    dislikeBtn.classList.add("btn", "dislike-btn");
+    dislikeBtn.setAttribute("data-tooltip", "Dislike");
+    dislikeBtn.innerHTML = '<i class="fa-solid fa-thumbs-down"></i>';
     dislikeBtn.onclick = function () {
       dislikeBtn.classList.toggle("disliked");
       if (likeBtn.classList.contains("liked")) {
@@ -345,18 +396,19 @@ function addMessage(text, sender, saveToConversation = true) {
   }
 }
 
+// ------------------------- Read Aloud Function -------------------------
 function toggleReadAloud(text, button) {
   if (isSpeaking) {
     window.speechSynthesis.cancel();
     isSpeaking = false;
     button.innerHTML = '<i class="fa-solid fa-volume-up"></i>';
   } else {
-    speechInstance = new SpeechSynthesisUtterance(text);
+    const plainText = text.replace(/<[^>]*>/g, '');
+    speechInstance = new SpeechSynthesisUtterance(plainText);
     speechInstance.volume = 1;
     speechInstance.rate = 1;
     speechInstance.pitch = 1;
     const voices = window.speechSynthesis.getVoices();
-    // Use a specific voice if available, otherwise default to the first one
     speechInstance.voice = voices.find(voice => voice.name.includes("Google UK English Male")) || voices[0];
     speechInstance.onend = () => {
       isSpeaking = false;
@@ -368,10 +420,25 @@ function toggleReadAloud(text, button) {
   }
 }
 
-function copyToClipboard(text) {
+// ------------------------- Copy to Clipboard with Notification -------------------------
+function copyToClipboard(text, button) {
   navigator.clipboard.writeText(text)
     .then(() => {
-      alert("Copied to clipboard!");
+      const notification = document.createElement("div");
+      notification.textContent = "Copied!";
+      notification.style.position = "absolute";
+      notification.style.background = "#007bff";
+      notification.style.color = "#fff";
+      notification.style.padding = "5px 10px";
+      notification.style.borderRadius = "4px";
+      notification.style.top = (button.offsetTop - 35) + "px";
+      notification.style.left = button.offsetLeft + "px";
+      notification.style.zIndex = "1000";
+      button.parentElement.style.position = "relative";
+      button.parentElement.appendChild(notification);
+      setTimeout(() => {
+        notification.remove();
+      }, 1500);
     })
     .catch(err => {
       console.error("Error copying text:", err);
@@ -418,8 +485,13 @@ function hideBotExplorer() {
   explorerOverlay.style.display = "none";
 }
 
+const availableBots = [
+  { id: 'general', name: 'General Bot', description: 'All-purpose chatbot.' },
+  { id: 'coding', name: 'Coding Bot', description: 'Assists with programming queries.' },
+  { id: 'math', name: 'Math Bot', description: 'Helps solve math problems.' }
+];
+
 function selectBot(bot) {
-  alert("Selected: " + bot.name);
   createNewChat();
   const activeTabElement = document.querySelector(`[data-id='${activeTab}']`);
   if (activeTabElement) {
@@ -428,6 +500,34 @@ function selectBot(bot) {
   }
 }
 
+// ------------------------- Profile Modal Functionality -------------------------
+const profileModal = document.getElementById('profile-modal');
+const closeProfileModal = document.getElementById('close-profile-modal');
+const profileForm = document.getElementById('profile-form');
+
+document.getElementById("profile-btn").addEventListener("click", function() {
+  profileModal.style.display = "flex";
+});
+
+closeProfileModal.addEventListener("click", function() {
+  profileModal.style.display = "none";
+});
+
+window.addEventListener("click", function(event) {
+  if (event.target === profileModal) {
+    profileModal.style.display = "none";
+  }
+});
+
+profileForm.addEventListener("submit", function(event) {
+  event.preventDefault();
+  const username = document.getElementById('username').value;
+  const email = document.getElementById('email').value;
+  
+  console.log("Profile saved:", { username, email });
+  profileModal.style.display = "none";
+});
+
 // ------------------------- Initialization -------------------------
 loadConversations();
 if (!activeTab) {
@@ -435,7 +535,10 @@ if (!activeTab) {
 }
 newChatButton.addEventListener("click", createNewChat);
 
-// Display chat header if the active conversation is empty
 if (conversations[activeTab] && conversations[activeTab].length === 0) {
   displayChatHeader();
 }
+
+document.getElementById("upgrade-btn").addEventListener("click", function() {
+  alert("Upgrade section clicked!");
+});
