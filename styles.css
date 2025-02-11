@@ -1,460 +1,721 @@
 /* ------------------------- Base Styles ------------------------- */
+* {
+  box-sizing: border-box;
+}
+
 body {
-    font-family: 'Arial', sans-serif;
-    background-color: #121212;
-    color: #fff;
-    display: flex;
-    height: 100vh;
-    margin: 0;
+  font-family: 'Arial', sans-serif;
+  background-color: #121212;
+  color: #fff;
+  margin: 0;
+  /* Use flex-direction column on mobile devices */
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ------------------------- Container ------------------------- */
+.container {
+  display: flex;
+  flex: 1;
+  transition: all 0.3s ease;
+}
+
+/* ------------------------- Mobile Sidebar Toggle Button ------------------------- */
+.mobile-sidebar-toggle {
+  display: none; /* Hidden by default; shown via media queries */
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 11000;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* ------------------------- Sidebar ------------------------- */
+.sidebar {
+  width: 250px;
+  background: #1e1e1e;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  border-right: 2px solid #333;
+  transition: transform 0.3s ease;
+}
+
+/* Sidebar hidden state for mobile (slides out) */
+.sidebar.hidden {
+  transform: translateX(-100%);
+}
+
+/* ------------------------- Logo and Controls ------------------------- */
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.sidebar h2 {
+  color: #ddd;
+  margin: 0;
+  font-size: 24px;
+}
+
+.theme-toggle-btn {
+  background: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-size: 24px;
+  color: inherit;
+}
+
+/* ------------------------- Profile and Upgrade Section ------------------------- */
+.profile-upgrade-section {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.profile-upgrade-section button {
+  background: #444;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: background 0.2s ease;
+}
+
+.profile-upgrade-section button:hover {
+  background: #007bff;
+}
+
+/* ------------------------- Theme Selector ------------------------- */
+.theme-selector {
+  margin-bottom: 15px;
+  color: inherit;
+  font-size: 14px;
+}
+
+.theme-selector label {
+  margin-right: 5px;
+}
+
+.theme-selector select {
+  background: #1e1e1e;
+  border: 1px solid #444;
+  border-radius: 4px;
+  color: #fff;
+  padding: 4px;
+  font-size: 14px;
+}
+
+body.light-mode .theme-selector select {
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  color: #000;
+}
+
+/* ------------------------- Chat Tabs ------------------------- */
+#tab-container {
+  flex-grow: 1;
+  width: 100%;
+}
+
+/* ------------------------- Tab Styles ------------------------- */
+.tab {
+  background: #333;
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  margin: 5px 0;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.tab.active {
+  background: #007bff;
+}
+
+.tab .tab-title {
+  flex-grow: 1;
+}
+
+.tab-menu-btn {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0 5px;
+}
+
+/* Dropdown for tab menu */
+.tab-menu-dropdown {
+  display: block;
+  position: absolute;
+  top: 40px;
+  right: 10px;
+  background: #333;
+  border: 1px solid #444;
+  border-radius: 4px;
+  z-index: 100;
+}
+
+.tab-menu-option {
+  padding: 8px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.tab-menu-option:hover {
+  background: #007bff;
+}
+
+/* ------------------------- Explore Bots and New Chat ------------------------- */
+#explore-bots,
+#new-chat {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  margin: 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+#explore-bots {
+  background: #28a745;
+  color: white;
+}
+
+#explore-bots i {
+  margin-right: 8px;
+}
+
+#explore-bots:hover {
+  background: #218838;
+}
+
+#new-chat {
+  background: #007bff;
+  color: white;
+}
+
+#new-chat:hover {
+  background: #0056b3;
+}
+
+/* ------------------------- Chat Section ------------------------- */
+.chat-section {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.chat-container {
+  width: 70%;
+  max-width: 900px;
+  background: #1e1e1e;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ------------------------- Chatbox ------------------------- */
+.chatbox {
+  max-height: 500px;
+  overflow-y: auto;
+  padding: 15px;
+  border-bottom: 2px solid #333;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ------------------------- Messages ------------------------- */
+.message {
+  padding: 12px 16px;
+  margin: 6px 0;
+  border-radius: 8px;
+  width: fit-content;
+  max-width: 75%;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.user {
+  background: #007bff;
+  color: white;
+  align-self: flex-end;
+}
+
+.bot {
+  background: #292929;
+  color: #ddd;
+  padding: 16px;
+  margin: 12px 0;
+  border-radius: 12px;
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+.bot h1,
+.bot h2,
+.bot h3,
+.bot h4,
+.bot h5,
+.bot h6 {
+  margin: 20px 0 10px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.bot p {
+  margin: 10px 0;
+}
+
+.bot ul,
+.bot ol {
+  margin: 10px 0 10px 20px;
+  padding-left: 20px;
+}
+
+.bot li {
+  margin: 5px 0;
+}
+
+.bot pre {
+  background: #1e1e1e;
+  color: #f8f8f2;
+  padding: 10px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 10px 0;
+}
+
+.bot code {
+  background: #1e1e1e;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+}
+
+/* ------------------------- Bot Buttons ------------------------- */
+.bot-buttons {
+  margin-top: 5px;
+  display: flex;
+  gap: 10px;
+}
+
+.like-btn.liked,
+.dislike-btn.disliked {
+  background: #007bff !important;
+}
+
+/* ------------------------- General Buttons ------------------------- */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: #333;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  font-size: 16px;
+  margin-right: 5px;
+}
+
+.btn:hover {
+  background: #007bff;
+}
+
+.btn i {
+  pointer-events: none;
+}
+
+/* ------------------------- Input Area ------------------------- */
+.input-container {
+  display: flex;
+  padding-top: 15px;
+}
+
+.input-container input {
+  flex: 1;
+  padding: 14px;
+  border: 1px solid #444;
+  border-radius: 8px;
+  background: #222;
+  color: white;
+  outline: none;
+  font-size: 16px;
+}
+
+.input-container button {
+  padding: 14px 20px;
+  background: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin-left: 8px;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+
+.input-container button:hover {
+  background: #0056b3;
+}
+
+/* ------------------------- Loading Spinner ------------------------- */
+.loading-spinner {
+  display: inline-block;
+}
+
+.loading-spinner span {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin: 0 2px;
+  background-color: #fff;
+  border-radius: 50%;
+  animation: loading 1.4s infinite ease-in-out both;
+}
+
+.loading-spinner span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.loading-spinner span:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes loading {
+  0%, 80%, 100% {
+    transform: scale(0);
   }
-  
-  .container {
-    display: flex;
-    width: 100%;
-    height: 100vh;
+  40% {
+    transform: scale(1);
   }
-  
-  /* ------------------------- Sidebar ------------------------- */
-  .sidebar {
-    width: 250px;
-    background: #1e1e1e;
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    border-right: 2px solid #333;
-  }
-  
-  .logo-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 15px;
-  }
-  
-  .sidebar h2 {
-    color: #ddd;
-    margin: 0;
-    font-size: 24px;
-  }
-  
-  .theme-toggle-btn {
-    background: none;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    font-size: 24px;
-    color: inherit;
-  }
-  
-  #tab-container {
-    flex-grow: 1;
-    width: 100%;
-  }
-  
-  /* ------------------------- Tab Styles ------------------------- */
-  .tab {
-    background: #333;
-    color: white;
-    padding: 12px;
-    border-radius: 8px;
-    margin: 5px 0;
-    cursor: pointer;
-    transition: background 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: relative;
-  }
-  
-  .tab.active {
-    background: #007bff;
-  }
-  
-  .tab .tab-title {
-    flex-grow: 1;
-  }
-  
-  .tab-menu-btn {
-    background: none;
-    border: none;
-    color: inherit;
-    font-size: 16px;
-    cursor: pointer;
-    padding: 0 5px;
-  }
-  
-  /* Updated dropdown: Always displays when added via JS */
-  .tab-menu-dropdown {
+}
+
+/* ------------------------- Bot Explorer Overlay ------------------------- */
+#bot-explorer-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+#bot-explorer-container {
+  background-color: #333;
+  padding: 20px;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 600px;
+  color: #fff;
+  position: relative;
+}
+
+#bot-explorer-container h2 {
+  margin-top: 0;
+  text-align: center;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* ------------------------- Bot Explorer Items ------------------------- */
+#bot-list .bot-item {
+  padding: 10px;
+  border: 1px solid #555;
+  margin: 10px 0;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+#bot-list .bot-item:hover {
+  background-color: #444;
+}
+
+/* ------------------------- Profile Modal ------------------------- */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 10000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.5);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: #333;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 500px;
+  color: #fff;
+  position: relative;
+}
+
+.modal-content h2 {
+  text-align: center;
+  margin-top: 0;
+}
+
+.close-button:hover,
+.close-button:focus {
+  color: #fff;
+}
+
+/* ------------------------- Profile Form ------------------------- */
+.profile-info {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.profile-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+#profile-form {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+#profile-form label {
+  align-self: flex-start;
+}
+
+#profile-form input {
+  padding: 8px;
+  width: 100%;
+  max-width: 300px;
+  border: 1px solid #555;
+  border-radius: 4px;
+}
+
+#profile-form button {
+  padding: 10px 20px;
+  background: #007bff;
+  border: none;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+#profile-form button:hover {
+  background: #0056b3;
+}
+
+/* ------------------------- Additional Themes ------------------------- */
+
+/* Light Mode */
+body.light-mode {
+  background-color: #fff;
+  color: #000;
+}
+
+body.light-mode .sidebar {
+  background: #f0f0f0;
+  border-right: 2px solid #ccc;
+}
+
+body.light-mode .sidebar h2 {
+  color: #333;
+}
+
+body.light-mode .tab {
+  background: #ddd;
+  color: #333;
+}
+
+body.light-mode .tab.active {
+  background: #007bff;
+  color: #fff;
+}
+
+body.light-mode .chat-container {
+  background: #f9f9f9;
+}
+
+body.light-mode .user {
+  background: #007bff;
+  color: #fff;
+}
+
+body.light-mode .bot {
+  background: #e0e0e0;
+  color: #333;
+}
+
+body.light-mode input {
+  background: #fff;
+  color: #000;
+  border: 1px solid #ccc;
+}
+
+/* Solarized Dark Theme */
+body.theme-solarized-dark {
+  background-color: #002b36;
+  color: #839496;
+}
+body.theme-solarized-dark .sidebar {
+  background: #073642;
+  border-right: 2px solid #586e75;
+}
+body.theme-solarized-dark .chat-container {
+  background: #073642;
+}
+
+/* Dracula Theme */
+body.theme-dracula {
+  background-color: #282a36;
+  color: #f8f8f2;
+}
+body.theme-dracula .sidebar {
+  background: #44475a;
+  border-right: 2px solid #6272a4;
+}
+body.theme-dracula .chat-container {
+  background: #44475a;
+}
+
+/* High Contrast Theme */
+body.theme-high-contrast {
+  background-color: #000;
+  color: #fff;
+}
+body.theme-high-contrast .sidebar {
+  background: #000;
+  border-right: 2px solid #fff;
+}
+body.theme-high-contrast .chat-container {
+  background: #000;
+}
+
+/* Material Design Theme */
+body.theme-material {
+  background-color: #fafafa;
+  color: #212121;
+}
+body.theme-material .sidebar {
+  background: #ffffff;
+  border-right: 2px solid #e0e0e0;
+}
+body.theme-material .chat-container {
+  background: #ffffff;
+}
+
+/* Pastel Theme */
+body.theme-pastel {
+  background-color: #f7f3f2;
+  color: #5d576b;
+}
+body.theme-pastel .sidebar {
+  background: #fff1e6;
+  border-right: 2px solid #e0d7d3;
+}
+body.theme-pastel .chat-container {
+  background: #fff1e6;
+}
+
+/* ------------------------- Responsive Adjustments for Mobile ------------------------- */
+@media (max-width: 768px) {
+  /* Show mobile sidebar toggle */
+  .mobile-sidebar-toggle {
     display: block;
-    position: absolute;
-    top: 40px;
-    right: 10px;
-    background: #333;
-    border: 1px solid #444;
-    border-radius: 4px;
-    z-index: 100;
   }
   
-  .tab-menu-option {
-    padding: 8px 12px;
-    cursor: pointer;
-    white-space: nowrap;
-  }
-  
-  .tab-menu-option:hover {
-    background: #007bff;
-  }
-  
-  /* ------------------------- Explore Bots Button ------------------------- */
-  #explore-bots {
-    background: #28a745;
-    color: white;
-    padding: 10px;
-    border: none;
-    cursor: pointer;
-    border-radius: 8px;
-    width: 100%;
-    margin: 10px 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  #explore-bots i {
-    margin-right: 8px;
-  }
-  
-  #explore-bots:hover {
-    background: #218838;
-  }
-  
-  /* ------------------------- New Chat Button ------------------------- */
-  #new-chat {
-    background: #007bff;
-    color: white;
-    padding: 10px;
-    border: none;
-    cursor: pointer;
-    border-radius: 8px;
-    width: 100%;
-  }
-  
-  #new-chat:hover {
-    background: #0056b3;
-  }
-  
-  /* ------------------------- Chat Section ------------------------- */
-  .chat-section {
-    flex-grow: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-  }
-  
-  .chat-container {
-    width: 70%;
-    max-width: 900px;
-    background: #1e1e1e;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-    padding: 20px;
-    display: flex;
+  /* Stack container vertically */
+  .container {
     flex-direction: column;
   }
   
-  .chatbox {
-    max-height: 500px;
-    overflow-y: auto;
-    padding: 15px;
-    border-bottom: 2px solid #333;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .message {
-    padding: 12px 16px;
-    margin: 6px 0;
-    border-radius: 8px;
-    width: fit-content;
-    max-width: 75%;
-    word-wrap: break-word;
-    white-space: pre-wrap;
-  }
-  
-  .user {
-    background: #007bff;
-    color: white;
-    align-self: flex-end;
-  }
-  
-  .bot {
-    background: #292929;
-    color: #ddd;
-    padding: 16px;
-    margin: 12px 0;
-    border-radius: 12px;
-    line-height: 1.6;
-    font-size: 16px;
-  }
-  
-  .bot h1,
-  .bot h2,
-  .bot h3,
-  .bot h4,
-  .bot h5,
-  .bot h6 {
-    margin: 20px 0 10px;
-    font-weight: bold;
-    color: #fff;
-  }
-  
-  .bot p {
-    margin: 10px 0;
-  }
-  
-  .bot ul,
-  .bot ol {
-    margin: 10px 0 10px 20px;
-    padding-left: 20px;
-  }
-  
-  .bot li {
-    margin: 5px 0;
-  }
-  
-  .bot pre {
-    background: #1e1e1e;
-    color: #f8f8f2;
-    padding: 10px;
-    border-radius: 8px;
-    overflow-x: auto;
-    margin: 10px 0;
-  }
-  
-  .bot code {
-    background: #1e1e1e;
-    padding: 2px 4px;
-    border-radius: 4px;
-    font-family: 'Courier New', monospace;
-  }
-  
-  /* ------------------------- Bot Options (Below Bot Message) ------------------------- */
-  .bot-buttons {
-    margin-top: 5px;
-    display: flex;
-    gap: 10px;
-  }
-  
-  /* ------------------------- Buttons ------------------------- */
-  .btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    background: #333;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: background 0.2s ease;
-    font-size: 16px;
-    margin-right: 5px;
-  }
-  
-  .btn:hover {
-    background: #007bff;
-  }
-  
-  .btn i {
-    pointer-events: none;
-  }
-  
-  .like-btn.liked {
-    background: #007bff !important;
-  }
-  
-  .dislike-btn.disliked {
-    background: #007bff !important;
-  }
-  
-  /* ------------------------- Input Area ------------------------- */
-  .input-container {
-    display: flex;
-    padding-top: 15px;
-  }
-  
-  .input-container input {
-    flex: 1;
-    padding: 14px;
-    border: 1px solid #444;
-    border-radius: 8px;
-    background: #222;
-    color: white;
-    outline: none;
-    font-size: 16px;
-  }
-  
-  .input-container button {
-    padding: 14px 20px;
-    background: #007bff;
-    color: white;
-    border: none;
-    cursor: pointer;
-    margin-left: 8px;
-    border-radius: 8px;
-    font-size: 16px;
-    transition: background 0.2s;
-  }
-  
-  .input-container button:hover {
-    background: #0056b3;
-  }
-  
-  /* ------------------------- Responsive ------------------------- */
-  @media (max-width: 800px) {
-    .chat-container {
-      width: 90%;
-    }
-    
-    .sidebar {
-      width: 100px;
-    }
-    
-    .tab {
-      font-size: 12px;
-      padding: 8px;
-    }
-  }
-  
-  /* ------------------------- Light Mode ------------------------- */
-  body.light-mode {
-    background-color: #fff;
-    color: #000;
-  }
-  
-  body.light-mode .sidebar {
-    background: #f0f0f0;
-    border-right: 2px solid #ccc;
-  }
-  
-  body.light-mode .sidebar h2 {
-    color: #333;
-  }
-  
-  body.light-mode .tab {
-    background: #ddd;
-    color: #333;
-  }
-  
-  body.light-mode .tab.active {
-    background: #007bff;
-    color: #fff;
-  }
-  
-  body.light-mode .chat-container {
-    background: #f9f9f9;
-  }
-  
-  body.light-mode .user {
-    background: #007bff;
-    color: #fff;
-  }
-  
-  body.light-mode .bot {
-    background: #e0e0e0;
-    color: #333;
-  }
-  
-  body.light-mode input {
-    background: #fff;
-    color: #000;
-    border: 1px solid #ccc;
-  }
-  
-  /* ------------------------- Loading Spinner ------------------------- */
-  .loading-spinner {
-    display: inline-block;
-  }
-  
-  .loading-spinner span {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    margin: 0 2px;
-    background-color: #fff;
-    border-radius: 50%;
-    animation: loading 1.4s infinite ease-in-out both;
-  }
-  
-  .loading-spinner span:nth-child(1) {
-    animation-delay: -0.32s;
-  }
-  
-  .loading-spinner span:nth-child(2) {
-    animation-delay: -0.16s;
-  }
-  
-  @keyframes loading {
-    0%, 80%, 100% {
-      transform: scale(0);
-    }
-    40% {
-      transform: scale(1);
-    }
-  }
-  
-  /* ------------------------- Bot Explorer Overlay Styles ------------------------- */
-  #bot-explorer-overlay {
-    display: none; /* Hidden by default; shown via JS */
+  /* Sidebar as overlay */
+  .sidebar {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
+    z-index: 10000;
+    width: 250px;
+    transform: translateX(-100%);
   }
   
-  #bot-explorer-container {
-    background-color: #333;
-    padding: 20px;
-    border-radius: 8px;
-    width: 80%;
-    max-width: 600px;
-    color: #fff;
-    position: relative;
+  /* When sidebar is active (toggled via JS) */
+  .sidebar.visible {
+    transform: translateX(0);
   }
   
-  #bot-explorer-container h2 {
+  /* Adjust chat section to fill available space */
+  .chat-section {
+    padding: 20px 10px;
     margin-top: 0;
-    text-align: center;
   }
   
-  .close-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: none;
-    border: none;
-    color: #fff;
-    font-size: 24px;
-    cursor: pointer;
-  }
-  
-  #bot-list .bot-item {
+  .chat-container {
+    width: 100%;
+    max-width: 100%;
     padding: 10px;
-    border: 1px solid #555;
-    margin: 10px 0;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: background 0.2s;
   }
   
-  #bot-list .bot-item:hover {
-    background-color: #444;
+  /* Adjust input field font sizes if needed */
+  .input-container input,
+  .input-container button {
+    font-size: 14px;
   }
-  
+}
