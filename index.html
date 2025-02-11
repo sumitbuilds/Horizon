@@ -1,47 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Chatbot</title>
+  <meta charset="UTF-8" />
+  <!-- Ensures proper scaling on mobile devices -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HORIZON Chatbot</title>
   <!-- Link to external CSS file -->
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css" />
   <!-- Font Awesome for icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
 </head>
 <body>
+  <!-- Mobile Sidebar Toggle (visible on small screens via CSS media queries) -->
+  <button id="mobile-sidebar-toggle" class="mobile-sidebar-toggle">
+    <i class="fa-solid fa-bars"></i>
+  </button>
+
   <div class="container">
-    <!-- Sidebar with logo, theme toggle, and chat tabs -->
-    <div class="sidebar">
+    <!-- Sidebar Section -->
+    <aside class="sidebar">
       <div class="logo-container">
         <h2>💬 HORIZON</h2>
         <button id="theme-toggle" class="theme-toggle-btn" data-tooltip="Toggle Theme">
           <i class="fa-solid fa-sun"></i>
         </button>
       </div>
+
+      <!-- Profile and Upgrade Section -->
+      <div class="profile-upgrade-section">
+        <button id="profile-btn">
+          <i class="fa-solid fa-user"></i> Profile
+        </button>
+        <button id="upgrade-btn">
+          <i class="fa-solid fa-arrow-up"></i> Upgrade
+        </button>
+      </div>
+
+      <!-- Theme Selector -->
+      <div class="theme-selector">
+        <label for="theme-select">Theme:</label>
+        <select id="theme-select">
+          <option value="default">Dark (Default)</option>
+          <option value="light-mode">Light</option>
+          <option value="theme-solarized-dark">Solarized Dark</option>
+          <option value="theme-dracula">Dracula</option>
+          <option value="theme-high-contrast">High Contrast</option>
+          <option value="theme-material">Material Design</option>
+          <option value="theme-pastel">Pastel</option>
+        </select>
+      </div>
+
+      <!-- Chat Tabs Container -->
       <div id="tab-container"></div>
-      <!-- New Explore Bots Button -->
+
+      <!-- Explore Bots Button -->
       <button id="explore-bots" onclick="showBotExplorer()">
         <i class="fa-solid fa-robot"></i> Explore Bots
       </button>
+
+      <!-- New Chat Button -->
       <button id="new-chat">➕ New Chat</button>
-    </div>
-    <!-- Chat Section -->
-    <div class="chat-section">
+    </aside>
+
+    <!-- Main Chat Section -->
+    <main class="chat-section">
       <div class="chat-container">
         <div id="chatbox" class="chatbox"></div>
         <div class="input-container">
           <button id="mic-toggle" class="btn" data-tooltip="Voice Input">
             <i class="fa-solid fa-microphone"></i>
           </button>
-          <input type="text" id="userInput" placeholder="Type a message...">
-          <!-- The Send button is now replaced with an arrow icon -->
+          <input type="text" id="userInput" placeholder="Type a message..." />
           <button onclick="sendMessage()">
             <i class="fa-solid fa-arrow-right"></i>
           </button>
         </div>
       </div>
-    </div>
+    </main>
   </div>
 
   <!-- Bot Explorer Overlay -->
@@ -52,6 +92,24 @@
         <i class="fa-solid fa-xmark"></i>
       </button>
       <div id="bot-list"></div>
+    </div>
+  </div>
+
+  <!-- Profile Modal -->
+  <div id="profile-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-button" id="close-profile-modal">&times;</span>
+      <h2>User Profile</h2>
+      <div class="profile-info">
+        <img src="default-avatar.png" alt="User Avatar" class="profile-avatar" />
+        <form id="profile-form">
+          <label for="username">Name:</label>
+          <input type="text" id="username" name="username" placeholder="Your name" />
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" placeholder="Your email" />
+          <button type="submit">Save</button>
+        </form>
+      </div>
     </div>
   </div>
 
